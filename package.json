@@ -4,7 +4,8 @@
 	"description": "",
 	"scripts": {
 		"dev": "parcel ./index.html",
-		"build": "parcel build ./index.html"
+		"build": "parcel build ./index.html",
+		"tailwind": "npx tailwindcss -i ./src/input.css -o ./src/output.css --watch"
 	},
 	"keywords": [],
 	"author": "",
