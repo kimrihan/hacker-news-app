@@ -39,36 +39,22 @@ export default class NewsFeedView extends View {
 		this.api = new NewsFeedApi(NEWS_URL);
 	}
 
-	render = (page: string = '1'): void => {
+	render = async (page: string = '1'): Promise<void> => {
 		this.store.currentPage = Number(page);
 
 		if (!this.store.hasFeeds) {
-			this.api.getDataWithPromise((feeds: NewsFeed[]) => {
-				this.store.setFeeds(feeds);
-				this.renderView();
-			});
+			this.store.setFeeds(await this.api.getData());
 		}
-		this.renderView();
-	};
 
-	renderView = () => {
-		if (this.store.hasFeeds) {
-			for (
-				let i = (this.store.currentPage - 1) * 10;
-				i < this.store.currentPage * 10;
-				i++
-			) {
-				const {
-					id,
-					title,
-					comments_count,
-					user,
-					points,
-					time_ago,
-					read,
-				} = this.store.getFeed(i);
+		for (
+			let i = (this.store.currentPage - 1) * 10;
+			i < this.store.currentPage * 10;
+			i++
+		) {
+			const { id, title, comments_count, user, points, time_ago, read } =
+				this.store.getFeed(i);
 
-				this.addHtml(/*html*/ `
+			this.addHtml(/*html*/ `
           <div class="p-6 ${
 				read ? 'bg-red-500' : 'bg-white'
 			} mt-6 rounded-lg shadow-md transition-colors duration-500 hover:bg-green-100">
@@ -89,13 +75,12 @@ export default class NewsFeedView extends View {
             </div>
           </div>
         `);
-			}
-
-			this.setTemplateData('news_feed', this.getHtml());
-			this.setTemplateData('prev_page', String(this.store.prevPage));
-			this.setTemplateData('next_page', String(this.store.nextPage));
-
-			this.updateView();
 		}
+
+		this.setTemplateData('news_feed', this.getHtml());
+		this.setTemplateData('prev_page', String(this.store.prevPage));
+		this.setTemplateData('next_page', String(this.store.nextPage));
+
+		this.updateView();
 	};
 }
